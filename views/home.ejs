@@ -65,7 +65,7 @@ const weatherIcons = {
 <!-- Nav Bar -->
 <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">Home</a>
+    <a class="navbar-brand" href="/">Home</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -78,15 +78,15 @@ const weatherIcons = {
           <a class="nav-link active" aria-current="page" href="/register">Register</a>
         </li>
       </ul>
-      <form class="d-flex">
-        <input class="form-control me-2" type="search" placeholder="Zipcode" aria-label="Zipcode">
+      <form class="d-flex" action="/search" method="GET">
+        <input class="form-control me-2" name="zipcode" type="search" placeholder="Zipcode" aria-label="Zipcode">
         <button class="btn btn-outline-success" type="submit">Search</button>
       </form>
     </div>
   </div>
 </nav>
 
-<h1 class="mb-4 text-center">Hourly Weather Forecast for Hunter College %></h1>
+<h1 class="mb-4 text-center Hunter"> <strong> Hourly Weather Forecast for Hunter College</strong></h1>
 
 <!-- Carousel -->
 <div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
@@ -112,8 +112,8 @@ const weatherIcons = {
 
 <!-- 12 Hour Forecast -->
 <% if (hourlyForecast) { %>
-  <div class="row row-cols-md-12 g-4 p-3">
-    <% for (let i = 0; i < 12; i++) { %>
+  <div class="row row-cols-sm-24 g-2 p-2">
+    <% for (let i = 0; i < 24; i++) { %>
       <div class="col">
         <div class="card bg-dark text-white text-center">
           <div class="card-body p-1 mb-2">

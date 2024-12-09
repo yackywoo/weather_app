@@ -1,4 +1,4 @@
-import express from "express";
+import express, { query } from "express";
 import pg from "pg";
 
 const app = express();
@@ -21,6 +21,7 @@ app.use(express.static("public"));
 //default home landing page
 app.get("/", async (req, res) => {
   const zipcode = 10065;
+  const email = decodeURIComponent(req.query.email || "");
 
   //convert zipcode into coordinates
   const geoResponse = await fetch(
@@ -29,7 +30,7 @@ app.get("/", async (req, res) => {
   const geoData = await geoResponse.json();
   
   //if valid response load weather
-  if (geoData.length > 0) {
+  if (geoData.length > 0 && String(zipcode).length === 5) {
     const latitude = geoData[0].lat;
     const longitude = geoData[0].lon;
 
@@ -38,12 +39,48 @@ app.get("/", async (req, res) => {
       `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m&hourly=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&forecast_days=1`
     );
 
-
     const data = await response.json();
     const hourlyForecast = data.hourly;
-    res.render("home.ejs", {zipcode, hourlyForecast});
+    res.render("home.ejs", {zipcode : zipcode, hourlyForecast : hourlyForecast, email : email });
   } else {
-    res.render("home.ejs", {error : "Error"});
+    res.render("home.ejs", {error : "Error", hourlyForecast : null, email : email });
+  }
+});
+
+//search function
+app.get("/search", async (req, res) => { 
+  const zipcode = decodeURIComponent(req.query.zipcode || "");
+  const email = decodeURIComponent(req.query.email || "");
+  try {
+    //convert zipcode into coordinates
+    const geoResponse = await fetch(
+      `https://nominatim.openstreetmap.org/search?postalcode=${zipcode}&country=US&format=json`
+    )
+    const geoData = await geoResponse.json();
+    
+    //if valid response load weather
+    if (geoData.length > 0 && String(zipcode).length === 5) {
+      const latitude = geoData[0].lat;
+      const longitude = geoData[0].lon;
+
+      //fetch weather response for given coordinates using open-meteo api
+      const response = await fetch(
+        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch`
+      );
+
+      const data = await response.json();
+      const currWeather = data.current_weather;
+      const dailyForecast = data.daily;
+
+      res.render("search.ejs", {currWeather : currWeather, dailyForecast : dailyForecast, email : email, zipcode : zipcode });
+      console.log(zipcode + " has been searched and loaded");
+    } else {
+      res.render("search.ejs", { error: "Invalid zipcode or location not found.", currWeather : null, dailyForecast : null, email : email, zipcode : zipcode });
+      console.log(zipcode + " has been searched and failed");
+    }
+  } catch (err) {
+    console.log(err + " occurred while search");
+    res.render("search.ejs", { error: "An error occurred while fetching data.", currWeather : null, dailyForecast : null, email : email, zipcode : zipcode });
   }
 });
 
@@ -178,7 +215,6 @@ app.post("/login", async (req, res) => {
 //logged in - account history
 app.get("/history", async (req, res) => {
   const email = req.query.email || ""; 
-  const zipcode = req.query.zipcode || "";
   const currWeather = req.query.currWeather ? JSON.parse(decodeURIComponent(req.query.currWeather)) : null;
   const dailyForecast = req.query.dailyForecast ? JSON.parse(decodeURIComponent(req.query.dailyForecast)) : null;
   
@@ -187,6 +223,13 @@ app.get("/history", async (req, res) => {
       "SELECT * FROM weather_history WHERE email = $1 ORDER BY date DESC",
       [email]
     );
+    //in history zipcode should be their most recent so it doesn't redirect to search result page when going back to '/home' 
+    const zipcodeData = await db.query( 
+      "SELECT * FROM users WHERE EMAIL = $1",
+      [email]
+    )
+    const user = zipcodeData.rows[0];
+    const zipcode = user.zipcode;
     console.log(email + " displaying history");
     res.render("history.ejs", { email, zipcode, currWeather, dailyForecast, weatherHistory: historyResult.rows });
   } catch (err) {

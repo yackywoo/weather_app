@@ -87,10 +87,6 @@ const weatherIcons = {
                 </li>
               <% } %>
         </ul>
-        <form class="d-flex">
-          <input class="form-control me-2" type="search" placeholder="Zipcode" aria-label="Zipcode">
-          <button class="btn btn-outline-success" type="submit">Search</button>
-        </form>
       </div>
     </div>
 </nav>
@@ -118,7 +114,7 @@ const weatherIcons = {
               <td><%= entry.zipcode %></td>
               <td><%= entry.temperature %>°F</td>
               <td><%= entry.windspeed %> mph</td>
-              <td><%= weatherIcons[currWeather.weathercode] || "❓" %> <%= weatherDescriptions[entry.weather_code] || "Unknown" %> </td>
+              <td><%= weatherIcons[entry.weather_code] || "Unknown" %> <%= weatherDescriptions[entry.weather_code] || "Unknown" %> </td>
             </tr>
           <% }) %>
         </tbody>

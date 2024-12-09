@@ -1,0 +1,151 @@
+<%- include('partials/header') %>
+
+<% const weatherDescriptions = {
+  0: "Clear sky",
+  1: "Mainly clear",
+  2: "Partly cloudy",
+  3: "Overcast",
+  45: "Fog",
+  48: "Depositing rime fog",
+  51: "Light drizzle",
+  53: "Moderate drizzle",
+  55: "Dense drizzle",
+  56: "Light freezing drizzle",
+  57: "Dense freezing drizzle",
+  61: "Slight rain",
+  63: "Moderate rain",
+  65: "Heavy rain",
+  66: "Light freezing rain",
+  67: "Heavy freezing rain",
+  71: "Slight snowfall",
+  73: "Moderate snowfall",
+  75: "Heavy snowfall",
+  77: "Snow grains",
+  80: "Slight rain showers",
+  81: "Moderate rain showers",
+  82: "Violent rain showers",
+  85: "Slight snow showers",
+  86: "Heavy snow showers",
+  95: "Thunderstorm",
+  96: "Thunderstorm with slight hail",
+  99: "Thunderstorm with heavy hail" 
+}; 
+
+const weatherIcons = {
+  0: "☀️",     
+  1: "🌤️",     
+  2: "⛅",
+  3: "☁️",
+  45: "🌫️",
+  48: "🌫️",
+  51: "🌧️",
+  53: "🌧️",
+  55: "🌧️",
+  56: "🌧️",
+  57: "🌧️",
+  61: "🌧️",
+  63: "🌧️",
+  65: "🌧️",
+  66: "🌧️",
+  67: "🌧️",
+  71: "🌨️",
+  73: "🌨️",
+  75: "🌨️",
+  77: "🌨️",
+  80: "🌧️",
+  81: "🌧️",
+  82: "🌧️",
+  85: "🌧️",
+  86: "🌧️",
+  95: "🌩️",
+  96: "🌩️",
+  99: "🌩️" 
+}; %>
+
+<!-- Nav Bar -->
+<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/history?email=<%= encodeURIComponent(email) %>&zipcode=<%= encodeURIComponent(zipcode) %>&currWeather=<%= encodeURIComponent(JSON.stringify(currWeather)) %>&dailyForecast=<%= encodeURIComponent(JSON.stringify(dailyForecast)) %>">History</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav me-auto mb-2 mb-md-0">
+            <% if (email) { %>
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="#">Hello, <%= email %></a>
+                </li>
+                <li class="nav-item">
+                  <a href="/logout?email=<%= encodeURIComponent(email) %>" class="btn btn-danger ms-3">Logout</a>
+                </li>
+              <% } else { %>
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="/login">Login</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="/register">Register</a>
+                </li>
+              <% } %>
+        </ul>
+        <form class="d-flex">
+          <input class="form-control me-2" type="search" placeholder="Zipcode" aria-label="Zipcode">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+      </div>
+    </div>
+  </nav>
+
+<!-- Weather display -->
+<% if (currWeather) { %>
+  <!-- Current Forecast -->
+  <div class="d-flex justify-content-center">
+    <div class="card bg-dark text-white text-center" style="width: 30rem;">
+      <div class="card-body">
+        <h2 class="card-title mb-4">Current Weather for <%= zipcode %></h2>
+        <div class="display-1 mb-3">
+          <%= weatherIcons[currWeather.weathercode] || "❓" %>
+        </div> 
+        <p><strong> Temperature: </strong> <%= currWeather.temperature %>°F</p>
+        <p><strong> Speed: </strong> <%= currWeather.windspeed %> mph</p>
+        <p><strong> Weather: </strong> <%= weatherDescriptions[currWeather.weathercode] || "Unknown weather condition" %></p>           
+      </div>
+    </div>
+  </div>
+
+  <!-- 7-Day Forecast -->
+  <div class="d-flex justify-content-center mt-5">
+    <div class="card bg-dark text-white" style="width: 90%; margin-bottom: 20px">
+      <div class="card-body">
+        <h3 class="card-title text-center mb-4">7-Day Forecast</h3>
+        <div class="row justify-content-center">
+          <% for (let i = 0; i < dailyForecast.time.length; i++) { %>
+            <div class="col-md-4 col-lg-3 mb-4">
+              <div class="card bg-secondary text-white text-center">
+                <div class="card-body">
+                  <h5 class="card-title"><%= new Date(dailyForecast.time[i]).toDateString() %></h5>
+                  <div class="display-4 mb-2">
+                    <%= weatherIcons[dailyForecast.weathercode[i]] || "❓" %>
+                  </div>
+                  <p><strong> Max Temp: </strong> <%= dailyForecast.temperature_2m_max[i] %>°F</p>
+                  <p><strong> Min Temp: </strong> <%= dailyForecast.temperature_2m_min[i] %>°F</p>
+                  <p><strong> Precipitation: </strong> <%= dailyForecast.precipitation_sum[i] %> in</p>
+                  <p><strong> Weather: </strong> <%= weatherDescriptions[dailyForecast.weathercode[i]] || "Unknown weather condition" %></p>
+                </div>
+              </div>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% } else { %>
+  <div class="alert alert-danger mt-4">Weather data is unavailable.</div>
+<% } %>
+
+
+<% if (typeof error !== "undefined") { %>
+  alert("<%= error %>");
+<% } %>
+
+
+<%- include('partials/footer') %>

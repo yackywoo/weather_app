@@ -114,7 +114,7 @@ const weatherIcons = {
               <td><%= entry.zipcode %></td>
               <td><%= entry.temperature %>°F</td>
               <td><%= entry.windspeed %> mph</td>
-              <td><%= weatherIcons[entry.weather_code] || "Unknown" %> <%= weatherDescriptions[entry.weather_code] || "Unknown" %> </td>
+              <td><%= weatherIcons[entry.weather_code] || "❓" %> <%= weatherDescriptions[entry.weather_code] || "Unknown" %> </td>
             </tr>
           <% }) %>
         </tbody>

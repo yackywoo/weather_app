@@ -1,5 +1,6 @@
 import express, { query } from "express";
 import pg from "pg";
+import axios from "axios";
 
 const app = express();
 const port = 3000;
@@ -24,10 +25,10 @@ app.get("/", async (req, res) => {
   const email = decodeURIComponent(req.query.email || "");
 
   //convert zipcode into coordinates
-  const geoResponse = await fetch(
+  const geoResponse = await axios.get(
     `https://nominatim.openstreetmap.org/search?postalcode=${zipcode}&country=US&format=json`
-  )
-  const geoData = await geoResponse.json();
+  );
+  const geoData = geoResponse.data;
   
   //if valid response load weather
   if (geoData.length > 0 && String(zipcode).length === 5) {
@@ -35,13 +36,22 @@ app.get("/", async (req, res) => {
     const longitude = geoData[0].lon;
 
     //fetch weather response for given coordinates using open-meteo api
-    const response = await fetch(
+    const response = await axios.get(
       `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m&hourly=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&forecast_days=1`
     );
 
-    const data = await response.json();
+    const data = response.data;
     const hourlyForecast = data.hourly;
-    res.render("home.ejs", {zipcode : zipcode, hourlyForecast : hourlyForecast, email : email });
+
+    //get current date
+    const date = new Date().toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+
+    res.render("home.ejs", {zipcode : zipcode, hourlyForecast : hourlyForecast, email : email, date : date });
   } else {
     res.render("home.ejs", {error : "Error", hourlyForecast : null, email : email });
   }
@@ -53,10 +63,10 @@ app.get("/search", async (req, res) => {
   const email = decodeURIComponent(req.query.email || "");
   try {
     //convert zipcode into coordinates
-    const geoResponse = await fetch(
+    const geoResponse = await axios.get(
       `https://nominatim.openstreetmap.org/search?postalcode=${zipcode}&country=US&format=json`
-    )
-    const geoData = await geoResponse.json();
+    );
+    const geoData = geoResponse.data;
     
     //if valid response load weather
     if (geoData.length > 0 && String(zipcode).length === 5) {
@@ -64,11 +74,10 @@ app.get("/search", async (req, res) => {
       const longitude = geoData[0].lon;
 
       //fetch weather response for given coordinates using open-meteo api
-      const response = await fetch(
+      const response = await axios.get(
         `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch`
       );
-
-      const data = await response.json();
+      const data = response.data;
       const currWeather = data.current_weather;
       const dailyForecast = data.daily;
 
@@ -163,10 +172,10 @@ app.post("/login", async (req, res) => {
         const zipcode = user.zipcode;
 
         //convert zipcode into coordinates
-        const geoResponse = await fetch(
+        const geoResponse = await axios.get(
           `https://nominatim.openstreetmap.org/search?postalcode=${zipcode}&country=US&format=json`
-        )
-        const geoData = await geoResponse.json();
+        );
+        const geoData = geoResponse.data;
         
         //if valid response load weather
         if (geoData.length > 0) {
@@ -174,11 +183,10 @@ app.post("/login", async (req, res) => {
           const longitude = geoData[0].lon;
 
           //fetch weather response for given coordinates using open-meteo api
-          const response = await fetch(
+          const response = await axios.get(
             `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch`
           );
-
-          const data = await response.json();
+          const data = response.data;
           const currWeather = data.current_weather;
           const dailyForecast = data.daily;
           console.log(user.email + " logged in");

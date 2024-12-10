@@ -86,7 +86,7 @@ const weatherIcons = {
   </div>
 </nav>
 
-<h1 class="mb-4 text-center Hunter"> <strong> Hourly Weather Forecast for Hunter College</strong></h1>
+<h1 class="mb-4 text-center Hunter"> <strong> Hourly Weather Forecast for Hunter College - <%= date %></strong></h1>
 
 <!-- Carousel -->
 <div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
@@ -110,7 +110,7 @@ const weatherIcons = {
   </button>
 </div>
 
-<!-- 12 Hour Forecast -->
+<!-- 24 Hour Forecast -->
 <% if (hourlyForecast) { %>
   <div class="row row-cols-sm-24 g-2 p-2">
     <% for (let i = 0; i < 24; i++) { %>

@@ -8,7 +8,7 @@
                 <form action="/register" method="POST">
                 <img class="mb-4 mx-auto d-block" src="https://cdn-icons-png.flaticon.com/512/1779/1779940.png" alt="" width="72" height="57">
                 <h1 class="h3 mb-3 fw-normal text-center">Register</h1>
-
+                
                 <div class="form-floating">
                     <input type="email" name="email" class="form-control bg-secondary" id="floatingInput" placeholder="name@example.com">
                     <label for="floatingInput">Email address</label>
@@ -21,19 +21,21 @@
                     <input type="zipcode" name="zipcode" class="form-control bg-secondary" id="floatingInput" placeholder="Zipcode">
                     <label for="floatingInput">Zipcode</label>
                 </div>
-
+                
                 <button class="w-100 btn btn-lg btn-primary" type="submit">Register</button>
-                <p class="mt-5 mb-3 text-muted">© 2024–2099</p>
+                <p class="mt-5 mb-3 text-center">© 2024–2099</p>
                 </form>
+
+                <% if (typeof error !== "undefined") { %>
+                    <p class="error text-center"><%= error %></p>
+                <% } %>
             </div>
         </div>
     </div>
 </div>
 
 
-<% if (typeof error !== "undefined") { %>
-    alert("<%= error %>");
-<% } %>
+
 
 
 <%- include('partials/footer') %>

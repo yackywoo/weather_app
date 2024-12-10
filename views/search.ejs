@@ -131,11 +131,8 @@ const weatherIcons = {
 <div class="alert alert-danger mt-4">Weather data is unavailable.</div>
 <% } %>
 
-
-
 <% if (typeof error !== "undefined") { %>
-    alert("<%= error %>");
+  <alert class="error"> <%= error %> </alert>
 <% } %>
-  
   
 <%- include('partials/footer') %>

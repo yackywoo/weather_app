@@ -125,10 +125,8 @@ const weatherIcons = {
   <% } %>
 </div>
 
-
 <% if (typeof error !== "undefined") { %>
-  alert("<%= error %>");
+  <alert class="error"> <%= error %> </alert>
 <% } %>
-
 
 <%- include('partials/footer') %>

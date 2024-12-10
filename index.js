@@ -128,27 +128,32 @@ app.post("/register", async (req, res) => {
   const password = req.body.password;
   const zipcode = req.body.zipcode;
 
-  try {
-    const checkResult = await db.query("SELECT * FROM users WHERE email = $1", [
-      email,
-    ]);
-    
-    //if find email in db, account already exists
-    if (checkResult.rows.length > 0) {
-      console.log(email + " email already exists");
-      res.render("register.ejs", { error: "Email already exists" });
-    } else {
-      //else if email not in db, then insert into db
-      const result = await db.query(
-        "INSERT INTO users (email, password, zipcode) VALUES ($1, $2, $3)",
-        [email, password, zipcode]
-      );
-      //direct to login page afterwards
-      console.log(email + " account created");
-      res.render("login.ejs");
+  //only register if zipcode is valid
+  if (String(zipcode).length === 5) {
+    try {
+      const checkResult = await db.query("SELECT * FROM users WHERE email = $1", [
+        email,
+      ]);
+      //if find email in db, account already exists
+      if (checkResult.rows.length > 0) {
+        console.log(email + " email already exists");
+        res.render("register.ejs", { error: "Email already exists" });
+      } else {
+        //else if email not in db, then insert into db
+        const result = await db.query(
+          "INSERT INTO users (email, password, zipcode) VALUES ($1, $2, $3)",
+          [email, password, zipcode]
+        );
+        //direct to login page afterwards
+        console.log(email + " account created");
+        res.render("login.ejs");
+      }
+    } catch (err) {
+      console.log(err);
+      res.render("register.ejs", { error : "Email account already exists" });
     }
-  } catch (err) {
-    console.log(err);
+  } else {
+    res.render("register.ejs", { error : "Invalid zipcode" });
   }
 });
 
@@ -212,7 +217,7 @@ app.post("/login", async (req, res) => {
       }
     } else {
       //if email not found
-      console.log(user.email + " not found");
+      console.log(email + " not found");
       res.render("login.ejs", { error: "User not found" });
     }
   } catch (err) {

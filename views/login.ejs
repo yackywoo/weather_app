@@ -19,17 +19,15 @@
                 </div>
 
                 <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
-                <p class="mt-5 mb-3 text-muted">© 2024–2099</p>
+                <p class="mt-5 mb-3 text-center">© 2024–2099</p>
                 </form>
+
+                <% if (typeof error !== "undefined") { %>
+                    <p class="error text-center"><%= error %></p>
+                <% } %>
             </div>
         </div>
     </div>
 </div>
-
-
-<% if (typeof error !== "undefined") { %>
-    alert("<%= error %>");
-<% } %>
-
 
 <%- include('partials/footer') %>

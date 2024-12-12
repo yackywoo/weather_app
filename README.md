@@ -8,12 +8,14 @@ Weather Tracking application. This allows you to see the current & 7-day forecas
 - **Historical Data**: Stores every login entry along with the weather forecast at that time.
 
 ## Installation
-1. **Install dependecies**:
+1. **Install dependencies**:
    ```
    npm i
    ```
-2. **Run server**:
+2. **Setup Database**: Create a PostgreSQL database and its tables using the SQL commands found in `table.sql` 
+
+3. **Run server**:
    ```
    nodemon index.js
    ```
-3. **Access the server**: Open yuour web browser and goto `http://localhost:3000/`
+4. **Access the server**: Open your web browser and goto `http://localhost:3000/`
